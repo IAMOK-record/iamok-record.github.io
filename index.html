@@ -215,14 +215,41 @@
   </footer>
 
   <script>
-    function handleSubmit(e) {
-      e.preventDefault();
-      const form = e.target;
-      const name = form.name.value;
-      const message = form.message.value;
-      document.getElementById('form-response').innerText = `感謝您，${name}，我們已收到您的留言！`;
-      form.reset();
+  const apiUrl = "http://localhost:5226/api/comments"; // ✅ 若有部署請改成你的 API 網址
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const name = form.name.value.trim();
+    const message = form.message.value.trim();
+
+    if (!name || !message) return;
+
+    try {
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name,
+          message: message,
+          createdAt: new Date().toISOString(),
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        document.getElementById("form-response").innerText = `感謝您，${data.name}，我們已收到您的留言！`;
+        form.reset();
+      } else {
+        document.getElementById("form-response").innerText = "送出失敗，請稍後再試。";
+      }
+    } catch (error) {
+      console.error("留言失敗：", error);
+      document.getElementById("form-response").innerText = "留言時發生錯誤，請稍後再試。";
     }
-  </script>
+  }
+</script>
 </body>
 </html>
