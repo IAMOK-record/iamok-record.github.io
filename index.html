@@ -171,6 +171,37 @@
     <div id="form-response"></div>
   </section>
 
+  <script>
+  document.getElementById('comment-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value;
+    const message = document.getElementById('message').value;
+
+    // 向後端 API 發送 POST 請求
+    fetch('/api/comments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: name,
+        message: message,
+        createdAt: new Date().toISOString(), // 自動填入當前時間
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('form-response').innerText = `感謝您的留言，${data.name}！我們已收到您的留言！`;
+      document.getElementById('comment-form').reset();
+    })
+    .catch(error => {
+      console.error('發送留言時出錯:', error);
+      document.getElementById('form-response').innerText = '發生錯誤，請再試一次。';
+    });
+  });
+</script>
+
   <section class="section" id="map">
     <h2>我們在哪裡？</h2>
     <iframe
